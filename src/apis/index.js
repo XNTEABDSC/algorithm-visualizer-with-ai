@@ -3,11 +3,19 @@ import axios from 'axios';
 
 axios.interceptors.response.use(response => response.data);
 
-const request = (url, process) => {
+const mapURL = (url)=>{
   const tokens = url.split('/');
   const baseURL = /^https?:\/\//i.test(url) ? '' : '/api';
-  return (...args) => {
+  return (...args)=>{
     const mappedURL = baseURL + tokens.map((token, i) => token.startsWith(':') ? args.shift() : token).join('/');
+    return mappedURL
+  }
+}
+
+const request = (url, process) => {
+  const toMapURL=mapURL(url)
+  return (...args) => {
+    const mappedURL = toMapURL(args)
     return Promise.resolve(process(mappedURL, args));
   };
 };
@@ -104,9 +112,22 @@ const TracerApi = {
   java: POST('/tracers/java'),
 };
 
+const AIApi={
+  chatNew: POST("/ai/chatnew"),
+  chatSync: POST("/ai/chatsync"),
+}
+/*
+return fetch(mapURL("/ai/call")(),{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(file)
+    })
+*/
+
 export {
   AlgorithmApi,
   VisualizationApi,
   GitHubApi,
   TracerApi,
+  AIApi,
 };

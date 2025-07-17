@@ -7,11 +7,14 @@ import faChevronLeft from '@fortawesome/fontawesome-free-solid/faChevronLeft';
 import faChevronRight from '@fortawesome/fontawesome-free-solid/faChevronRight';
 import faPause from '@fortawesome/fontawesome-free-solid/faPause';
 import faWrench from '@fortawesome/fontawesome-free-solid/faWrench';
-import { classes, extension } from 'common/util';
-import { TracerApi } from 'apis';
+import { classes, createUserFile, extension } from 'common/util';
+import { TracerApi,AIApi } from 'apis';
 import { actions } from 'reducers';
 import { BaseComponent, Button, ProgressBar } from 'components';
 import styles from './Player.module.scss';
+import { callAI } from 'common/util';
+
+const decoder=new TextDecoder('utf-8')
 
 class Player extends BaseComponent {
   constructor(props) {
@@ -94,6 +97,52 @@ class Player extends BaseComponent {
     }
   }
 
+  callAI(file){
+    console.log(this.props)
+    console.log(`Chat start`)
+    let chatNew_req=AIApi.chatNew(file)
+    console.log(chatNew_req)
+    chatNew_req.then(
+      chatNew_response=>{
+        console.log(chatNew_response)
+        const {chatId}=chatNew_response
+        console.log(`Chat ${chatId} started`)
+
+        const interval=setInterval(()=>{
+
+          let chatSync_req=AIApi.chatSync({chatId})
+          chatSync_req.then(chatSync_res=>{
+
+            console.log(chatSync_res)
+            for(let sync_Action of chatSync_res){
+              const action_type=sync_Action.type
+              switch (action_type){
+                case("FileCreate"):{
+                  const {fileName}=sync_Action
+                  this.props.addFile(createUserFile(fileName,""))
+                  break;
+                }
+                case("FileAppend"):{
+                  const {fileName,appends}=sync_Action
+                  this.props.appendFile(fileName,appends)
+                  break;
+                }
+                case("ChatGenEnd"):{
+                  console.log(`Chat ${chatId} ended`)
+                  clearInterval(interval)
+                  //interval.close()
+                  break;
+                }
+              }
+            }
+
+          })
+
+        },200)
+      }
+    )
+  }
+
   isValidCursor(cursor) {
     const { chunks } = this.props.player;
     return 1 <= cursor && cursor <= chunks.length;
@@ -162,6 +211,9 @@ class Player extends BaseComponent {
             <Button icon={faPlay} primary onClick={() => this.resume(true)}>Play</Button>
           )
         }
+        <Button icon={faWrench} onClick={()=>this.callAI(editingFile)}> 
+          {"Call AI"}
+        </Button>
         <Button icon={faChevronLeft} primary disabled={!this.isValidCursor(cursor - 1)} onClick={() => this.prev()}/>
         <ProgressBar className={styles.progress_bar} current={cursor} total={chunks.length}
                      onChangeProgress={progress => this.handleChangeProgress(progress)}/>

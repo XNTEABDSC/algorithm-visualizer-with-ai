@@ -2,6 +2,8 @@ import { combineActions, createAction, handleActions } from 'redux-actions';
 import { ROOT_README_MD } from 'files';
 import { extension, isSaved } from 'common/util';
 
+import { createFile } from 'common/util';
+
 const prefix = 'CURRENT';
 
 const setHome = createAction(`${prefix}/SET_HOME`, () => defaultState);
@@ -23,6 +25,7 @@ const addFile = createAction(`${prefix}/ADD_FILE`, file => ({ file }));
 const renameFile = createAction(`${prefix}/RENAME_FILE`, (file, name) => ({ file, name }));
 const modifyFile = createAction(`${prefix}/MODIFY_FILE`, (file, content) => ({ file, content }));
 const deleteFile = createAction(`${prefix}/DELETE_FILE`, file => ({ file }));
+const appendFile = createAction(`${prefix}/APPEND_FILE`, (fileName, content) => ({ fileName, content }));
 
 export const actions = {
   setHome,
@@ -34,6 +37,7 @@ export const actions = {
   modifyFile,
   deleteFile,
   renameFile,
+  appendFile,
 };
 
 const homeTitles = ['Algorithm Visualizer'];
@@ -141,4 +145,23 @@ export default handleActions({
       saved: isSaved(newState),
     };
   },
+  [appendFile]:(state,{payload})=>{
+    const {fileName, content }=payload
+    const files=state.files.map(oldFile=>{
+      if (oldFile.name==fileName){
+        return createFile(fileName,oldFile.content+content,oldFile.contributor)
+        //{name:fileName,content:oldFile.content+content,contributor}
+      }else{
+        return oldFile
+      }
+    })
+    const newState = {
+      ...state,
+      files
+    }
+    return{
+      ...newState,
+      saved: isSaved(newState),
+    }
+  }
 }, defaultState);
