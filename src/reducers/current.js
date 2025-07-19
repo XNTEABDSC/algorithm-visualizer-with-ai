@@ -104,7 +104,7 @@ export default handleActions({
     const newState = {
       ...state,
       files: [...state.files, file],
-      editingFile: file,
+      //editingFile: file,
       shouldBuild: true,
     };
     return {
@@ -147,9 +147,14 @@ export default handleActions({
   },
   [appendFile]:(state,{payload})=>{
     const {fileName, content }=payload
+    let editingFile=state.editingFile
     const files=state.files.map(oldFile=>{
       if (oldFile.name==fileName){
-        return createFile(fileName,oldFile.content+content,oldFile.contributor)
+        const newFile=createFile(fileName,oldFile.content+content,oldFile.contributor)
+        if (editingFile==oldFile){
+          editingFile=newFile
+        }
+        return newFile
         //{name:fileName,content:oldFile.content+content,contributor}
       }else{
         return oldFile
@@ -157,7 +162,9 @@ export default handleActions({
     })
     const newState = {
       ...state,
-      files
+      files,
+      shouldBuild: true,
+      editingFile
     }
     return{
       ...newState,

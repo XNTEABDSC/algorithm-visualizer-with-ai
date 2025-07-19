@@ -17,6 +17,7 @@ class TabContainer extends React.Component {
     let count = 0;
     while (files.some(file => file.name === newFile.name)) newFile.name = `code-${++count}.${ext}`;
     this.props.addFile(newFile);
+    this.props.setEditingFile(newFile)
   }
 
   render() {

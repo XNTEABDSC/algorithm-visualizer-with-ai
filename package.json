@@ -25,7 +25,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8080",
+  "proxy": "http://localhost:23232",
   "license": "MIT",
   "engines": {
     "node": ">=10.15.3"

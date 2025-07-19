@@ -115,6 +115,7 @@ const TracerApi = {
 const AIApi={
   chatNew: POST("/ai/chatnew"),
   chatSync: POST("/ai/chatsync"),
+  test: POST("/ai/test")
 }
 /*
 return fetch(mapURL("/ai/call")(),{

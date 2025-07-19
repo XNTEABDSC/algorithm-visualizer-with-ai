@@ -98,49 +98,83 @@ class Player extends BaseComponent {
   }
 
   callAI(file){
-    console.log(this.props)
+    let props=this.props
+    //console.log(this.props)
     console.log(`Chat start`)
     let chatNew_req=AIApi.chatNew(file)
-    console.log(chatNew_req)
+    //console.log(chatNew_req)
+    
     chatNew_req.then(
+
       chatNew_response=>{
-        console.log(chatNew_response)
+        //console.log(chatNew_response)
         const {chatId}=chatNew_response
         console.log(`Chat ${chatId} started`)
 
-        const interval=setInterval(()=>{
+        
 
+        function syncFn(){
+          console.log(`try sync`)
           let chatSync_req=AIApi.chatSync({chatId})
+
           chatSync_req.then(chatSync_res=>{
 
             console.log(chatSync_res)
+
+            let finished=false
+
             for(let sync_Action of chatSync_res){
+
               const action_type=sync_Action.type
+
               switch (action_type){
                 case("FileCreate"):{
-                  const {fileName}=sync_Action
-                  this.props.addFile(createUserFile(fileName,""))
+                  const {fileName,select}=sync_Action
+                  const newFile=createUserFile(fileName,"")
+                  props.addFile(newFile)
+                  if (select){
+                    props.setEditingFile(newFile)
+                  }
                   break;
                 }
+
                 case("FileAppend"):{
                   const {fileName,appends}=sync_Action
-                  this.props.appendFile(fileName,appends)
+                  props.appendFile(fileName,appends)
                   break;
                 }
+                
                 case("ChatGenEnd"):{
-                  console.log(`Chat ${chatId} ended`)
-                  clearInterval(interval)
+                  
+                  
                   //interval.close()
+                  finished=true
                   break;
                 }
               }
             }
 
+            if (finished){
+              console.log(`Chat ${chatId} ended`)
+            }
+            else{
+              setTimeout(syncFn,200)
+            }
+            
+          }).catch((err)=>{
+            console.log(`sync error for chat ${chatId}: ${err}`)
           })
 
-        },200)
+        }
+        setTimeout(syncFn,200)
       }
-    )
+    ).catch((err)=>{
+      console.log(`sync error for creating chat: ${err}`)
+    })
+  }
+
+  test(){
+    AIApi.test()
   }
 
   isValidCursor(cursor) {
@@ -213,6 +247,9 @@ class Player extends BaseComponent {
         }
         <Button icon={faWrench} onClick={()=>this.callAI(editingFile)}> 
           {"Call AI"}
+        </Button>
+        <Button icon={faWrench} onClick={()=>this.test()}> 
+          {"TEST"}
         </Button>
         <Button icon={faChevronLeft} primary disabled={!this.isValidCursor(cursor - 1)} onClick={() => this.prev()}/>
         <ProgressBar className={styles.progress_bar} current={cursor} total={chunks.length}

@@ -13,5 +13,5 @@ tasks:
 ports:
   - port: 3000
     onOpen: notify
-  - port: 8080
+  - port: 23232
     onOpen: ignore
