@@ -101,7 +101,11 @@ class Player extends BaseComponent {
     let props=this.props
     //console.log(this.props)
     console.log(`Chat start`)
-    let chatNew_req=AIApi.chatNew(file)
+    const tosend={
+      name:file.name,
+      content:file.content
+    }
+    let chatNew_req=AIApi.chatNew(tosend)
     //console.log(chatNew_req)
     
     chatNew_req.then(
@@ -151,6 +155,18 @@ class Player extends BaseComponent {
                   finished=true
                   break;
                 }
+
+                case("Log"):{
+                  console.log(sync_Action)
+                  break;
+                }
+
+                case("Error"):{
+                  console.log(`Chat ${chatId} Error`)
+                  console.log(sync_Action)
+                  finished=true
+                  break;
+                }
               }
             }
 
@@ -173,9 +189,7 @@ class Player extends BaseComponent {
     })
   }
 
-  test(){
-    AIApi.test()
-  }
+  
 
   isValidCursor(cursor) {
     const { chunks } = this.props.player;
@@ -247,9 +261,6 @@ class Player extends BaseComponent {
         }
         <Button icon={faWrench} onClick={()=>this.callAI(editingFile)}> 
           {"Call AI"}
-        </Button>
-        <Button icon={faWrench} onClick={()=>this.test()}> 
-          {"TEST"}
         </Button>
         <Button icon={faChevronLeft} primary disabled={!this.isValidCursor(cursor - 1)} onClick={() => this.prev()}/>
         <ProgressBar className={styles.progress_bar} current={cursor} total={chunks.length}
