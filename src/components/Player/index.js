@@ -157,13 +157,13 @@ class Player extends BaseComponent {
                 }
 
                 case("Log"):{
-                  console.log(sync_Action)
+                  console.log(sync_Action.msg)
                   break;
                 }
 
                 case("Error"):{
                   console.log(`Chat ${chatId} Error`)
-                  console.log(sync_Action)
+                  console.log(sync_Action.msg)
                   finished=true
                   break;
                 }
@@ -174,7 +174,7 @@ class Player extends BaseComponent {
               console.log(`Chat ${chatId} ended`)
             }
             else{
-              setTimeout(syncFn,200)
+              setTimeout(syncFn,500)
             }
             
           }).catch((err)=>{
@@ -189,7 +189,9 @@ class Player extends BaseComponent {
     })
   }
 
-  
+  test(){
+    this.callAI(createUserFile("README.md","请向我解释红黑树的原理，包括插入算法和删除算法，你要先解释红黑树，然后通过algorithm-visualizer演示其运行过程"))
+  }
 
   isValidCursor(cursor) {
     const { chunks } = this.props.player;
@@ -260,6 +262,9 @@ class Player extends BaseComponent {
           )
         }
         <Button icon={faWrench} onClick={()=>this.callAI(editingFile)}> 
+          {"Call AI"}
+        </Button>
+        <Button icon={faWrench} onClick={()=>this.test()}> 
           {"Call AI"}
         </Button>
         <Button icon={faChevronLeft} primary disabled={!this.isValidCursor(cursor - 1)} onClick={() => this.prev()}/>
