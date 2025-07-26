@@ -265,7 +265,7 @@ class Player extends BaseComponent {
           {"Call AI"}
         </Button>
         <Button icon={faWrench} onClick={()=>this.test()}> 
-          {"Call AI"}
+          {"Test"}
         </Button>
         <Button icon={faChevronLeft} primary disabled={!this.isValidCursor(cursor - 1)} onClick={() => this.prev()}/>
         <ProgressBar className={styles.progress_bar} current={cursor} total={chunks.length}
