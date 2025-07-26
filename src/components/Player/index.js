@@ -190,7 +190,7 @@ class Player extends BaseComponent {
   }
 
   test(){
-    this.callAI(createUserFile("README.md","请向我解释红黑树的原理，包括插入算法和删除算法，你要先解释红黑树，然后通过algorithm-visualizer演示其运行过程"))
+    this.callAI(createUserFile("README.md","请向我演示冒泡排序"))
   }
 
   isValidCursor(cursor) {
